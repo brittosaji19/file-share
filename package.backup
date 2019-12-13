@@ -68,6 +68,7 @@
     "@babel/preset-env": "^7.7.1",
     "@babel/preset-react": "^7.7.0",
     "babel-loader": "^8.0.6",
+    "bufferutil": "^4.0.1",
     "electron-squirrel-startup": "^1.0.0",
     "evilscan": "^1.7.5",
     "express": "^4.17.1",
@@ -76,7 +77,9 @@
     "react-dom": "^16.11.0",
     "react-router-dom": "^5.1.2",
     "socket.io": "^2.3.0",
-    "socket.io-client": "^2.3.0"
+    "socket.io-client": "^2.3.0",
+    "utf-8-validate": "^5.0.2",
+    "uws": "10.148.1"
   },
   "devDependencies": {
     "@electron-forge/cli": "6.0.0-beta.45",

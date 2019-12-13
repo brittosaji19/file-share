@@ -1,6 +1,5 @@
 const { app, BrowserWindow } = require("electron");
-import Server from "src/main/server";
-import NetWorkScanner from "src/main/scanner";
+import { initializeServer } from "src/main/initialize";
 
 // Handle creating/removing shortcuts on Windows when installing/uninstalling.
 if (require("electron-squirrel-startup")) {
@@ -36,15 +35,13 @@ const createWindow = () => {
     mainWindow = null;
   });
 };
-const initializeServer = () => {
-  new Server();
-  console.log(new NetWorkScanner().scan());
-};
 // This method will be called when Electron has finished
 // initialization and is ready to create browser windows.
 // Some APIs can only be used after this event occurs.
 app.on("ready", createWindow);
-app.on("ready", initializeServer);
+app.on("ready", () => {
+  initializeServer(mainWindow);
+});
 
 // Quit when all windows are closed.
 app.on("window-all-closed", () => {
