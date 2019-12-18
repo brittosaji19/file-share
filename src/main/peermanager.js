@@ -41,8 +41,11 @@ class PeerManager {
   }
   sendFileToPeer(peer, file) {
     this.requestFileAcceptance(peer, file.name)
-      .then(() => {
-        console.log("file request accepted buhhahahaha",file);
+      .then((ioconnection, peer) => {
+        console.log("file request accepted buhhahahaha", file);
+        let transferControl = this.server.getTransferControl();
+        console.log(transferControl);
+        ioconnection.emit("start_upload");
       })
       .catch(error => {
         console.log(error);
@@ -63,7 +66,7 @@ class PeerManager {
         reject("request timed-out");
       }, 60000);
       ioconnection.on("incoming_file_accepted", () => {
-        resolve(peer, filename);
+        resolve(ioconnection, peer, filename);
       });
       ioconnection.on("incoming_file_rejected", () => {
         reject("file rejected by peer");
@@ -78,6 +81,7 @@ class PeerManager {
       .on("incoming_file_request_accepted", (event, peer, filename) => {
         console.log("Accepted File Request", filename, peer);
         socket.emit("incoming_file_accepted", { ip: peer.ip });
+        // TODO: Start upload event handler
       });
   }
 }
