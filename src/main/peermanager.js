@@ -40,12 +40,23 @@ class PeerManager {
     return this.knownPeers;
   }
   sendFileToPeer(peer, file) {
+    let transferControl = this.server.getTransferControl();
+    let fileId = transferControl.addFileToContext(
+      file.name,
+      file.path,
+      file.data
+    );
     this.requestFileAcceptance(peer, file.name)
       .then((ioconnection, peer) => {
-        console.log("file request accepted buhhahahaha", file);
-        let transferControl = this.server.getTransferControl();
-        console.log(transferControl);
-        ioconnection.emit("start_upload");
+        // console.log(transferControl);
+        ioconnection.emit("start_upload", {
+          id: fileId,
+          name: file.name,
+          size: file.data.length
+        });
+        ioconnection.on("send_slice", (id, slice, size) => {
+          transferControl.sendFileSlice(ioconnection, fileId, slice, size);
+        });
       })
       .catch(error => {
         console.log(error);
@@ -79,9 +90,17 @@ class PeerManager {
     this.server
       .ipcMain()
       .on("incoming_file_request_accepted", (event, peer, filename) => {
-        console.log("Accepted File Request", filename, peer);
         socket.emit("incoming_file_accepted", { ip: peer.ip });
-        // TODO: Start upload event handler
+        socket.on("start_upload", file => {
+          let transferControl = this.server.getTransferControl();
+          transferControl.registerIncomingFile(
+            file.id,
+            socket,
+            file.name,
+            file.size
+          );
+          transferControl.grabSlices(file.id);
+        });
       });
   }
 }
