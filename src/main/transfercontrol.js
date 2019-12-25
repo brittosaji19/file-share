@@ -1,17 +1,23 @@
 import uuid from "uuid/v4";
 import fs from "fs";
-import os from 'os';
+import os from "os";
 class TransferControl {
   constructor(server) {
     this.server = server;
     this.fileArray = [];
     this.incomingFiles = [];
   }
-  addFileToContext(name, path, data) {
+  addFileToContext(name, path) {
     let id = uuid();
+    let data = fs.readFileSync(path);
     this.fileArray.push({ id, name, path, data });
     console.log(`${name.toUpperCase()} added to context with id ${id}`);
     return id;
+  }
+  getSize(id) {
+    let file = this.getFile(id);
+    if (!file) return false;
+    return file.data.length;
   }
   removeFileFromContext(id) {
     //// TODO: Remove file from memory
@@ -56,13 +62,23 @@ class TransferControl {
     });
     console.log("registered " + name + id);
   }
-  grabSlices(id) {
+  grabSlices(id, peer) {
     let file = null;
     for (let incomingFile of this.incomingFiles) {
       if (incomingFile.id === id) file = incomingFile;
     }
     if (!file) return false;
     let current_slice = 0;
+    this.server.ipcMain().handle("download_progress", () => {
+      return {
+        peer: peer,
+        current: Math.min(current_slice * 100000, file.size),
+        max: file.size
+      };
+    });
+    // this.server
+    //   .getWindow()
+    //   .webContents.send("download_progress", peer, file.data.length, file.size);
     file.connection.emit("send_slice");
     file.connection.on("slice_upload", slice => {
       console.log("slice received ", slice, current_slice, file.data.length);
@@ -72,12 +88,13 @@ class TransferControl {
         file.connection.emit("send_slice", file.id, current_slice);
       }
     });
+
     file.connection.on("end_upload", id => {
       console.log("end_log", file.data, file.data.length);
       let filebuffer = new Buffer.concat(file.data);
       console.log(filebuffer);
-      fs.open(os.homedir()+"/Downloads/" + file.name, "w", (err, fd) => {
-        console.log(fd,err);
+      fs.open(os.homedir() + "/Downloads/" + file.name, "w", (err, fd) => {
+        console.log(fd, err);
         fs.write(fd, filebuffer, err => {
           if (err) return socket.emit("upload error");
           file.connection.emit("upload_success");

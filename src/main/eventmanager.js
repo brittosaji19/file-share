@@ -44,6 +44,9 @@ class EventManager {
     });
   }
   listenAll() {
+    this.server.ipcMain().handle("show_main_window", event => {
+      this.server.getWindow().show();
+    });
     this.ioserver.on("connection", socket => {
       this.listenForHostnameRequest(socket);
       this.listenForIncomingFileRequest(socket);

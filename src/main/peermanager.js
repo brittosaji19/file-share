@@ -41,18 +41,14 @@ class PeerManager {
   }
   sendFileToPeer(peer, file) {
     let transferControl = this.server.getTransferControl();
-    let fileId = transferControl.addFileToContext(
-      file.name,
-      file.path,
-      file.data
-    );
+    let fileId = transferControl.addFileToContext(file.name, file.path);
     this.requestFileAcceptance(peer, file.name)
       .then((ioconnection, peer) => {
         // console.log(transferControl);
         ioconnection.emit("start_upload", {
           id: fileId,
           name: file.name,
-          size: file.data.length
+          size: transferControl.getSize(fileId) //needs to be read slice by slice, or has trouble sending very large files
         });
         ioconnection.on("send_slice", (id, slice, size) => {
           transferControl.sendFileSlice(ioconnection, fileId, slice, size);
@@ -99,7 +95,7 @@ class PeerManager {
             file.name,
             file.size
           );
-          transferControl.grabSlices(file.id);
+          transferControl.grabSlices(file.id, peer);
         });
       });
   }

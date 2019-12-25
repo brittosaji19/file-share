@@ -1,0 +1,11 @@
+div.ProgressBarContainer{
+  height:5px;
+  width:150px;
+  background-color: #fff;
+  border-radius: 5px;
+  overflow: hidden;
+}
+div.ProgressBarProgress{
+  background-color: #4f98ca;
+  height:5px;
+}

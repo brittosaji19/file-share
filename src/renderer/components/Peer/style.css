@@ -1,0 +1,68 @@
+.PeerContainer {
+  position: relative;
+  width: 250px;
+  font-family: sans-serif;
+}
+.PeerPersonIconWrapper {
+  height: 50px;
+  width: 50px;
+  border-radius: 50%;
+  border: 3px solid #4f98ca;
+}
+.PeerPersonIconWrapper img {
+  height: 50px;
+  width: 50px;
+}
+
+.PeerTitle {
+  font-family: sans-serif;
+  margin: 8px 0px;
+  font-size: 14px;
+}
+.PeerActionPopupContainer {
+  height: 80px;
+  width: 240px;
+  background-color: #fff;
+  padding: 8px;
+  box-shadow: 0px 2px 20px #27272710, 0px 4px 40px #27272710;
+  border-radius: 5px;
+  position: absolute;
+  top: -85px;
+  right: 0px;
+  left: 150px;
+  box-sizing: border-box;
+  font-size: 14px;
+}
+.PeerActionPopupActionButtonContainer {
+  display: flex;
+  position: absolute;
+  right: 0px;
+  bottom: 0px;
+}
+.PeerActionPopupContainer p {
+  margin: 0px;
+}
+.PeerActionButton {
+  height: 30px;
+  width: 60px;
+  font-size: 14px;
+  margin: 0px 1px;
+  color: #fff;
+  cursor: pointer;
+  /* border-radius: 15px; */
+}
+.PeerActionButtonConfirm {
+  background-color: #4f98ca;
+}
+.PeerActionButtonCancel {
+  background-color: #eb4d55;
+}
+/* TODO: Move to main css file to be shared globally for all components */
+.column {
+  flex-direction: column;
+}
+.centerize {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
