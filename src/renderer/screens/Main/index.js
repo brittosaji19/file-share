@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect } from "react";
 import { ipcRenderer } from "electron";
 import Peer from "../../Components/Peer";
 import "./style.css";
@@ -18,13 +18,11 @@ const SetIncomingFileListener = callback => {
 };
 const SetDownloadProgressListener = callback => {
   // ipcRenderer.removeAllListeners("download_progress");
-  setInterval(() => {
-    console.log("getting progress");
-    ipcRenderer.invoke("download_progress").then(progress => {
-      console.log("got progress", progress);
-      callback(progress.peer, progress.current, progress.max);
-    });
-  }, 500);
+  // console.log("getting progress");
+  ipcRenderer.on("download_progress", (event, peer, current, max) => {
+    console.log("got progress", peer, current, max);
+    callback(peer, current, max);
+  });
 };
 // const title = "File Share";
 // const options = { body: `${peer.hostname} is sending you a file` };
@@ -51,6 +49,9 @@ const Main = props => {
     isDownloadProgressListening,
     setisDownloadProgressListening
   ] = React.useState(false);
+  useEffect(() => {
+    console.log("update");
+  });
   const getLocalPeers = () => {
     ipcRenderer.invoke("local_peer").then(local_peers => {
       setisLocalListenerListening(true);
@@ -73,9 +74,12 @@ const Main = props => {
   });
   if (!isDownloadProgressListening) {
     SetDownloadProgressListener((peer, value, max) => {
-      let current = activeTransfers;
-      current[peer.ip] = { current: value, max: max };
-      setActiveTransfers(current);
+      console.log("setter params value", value);
+      let current = {};
+      current[peer.ip] = {};
+      current[peer.ip]["current"] = value;
+      current[peer.ip]["max"] = max;
+      setActiveTransfers({ ...activeTransfers, ...current });
     });
     setisDownloadProgressListening(true);
   }
@@ -127,6 +131,7 @@ const Main = props => {
           />
         );
       })}
+      {(!peers || peers.length === 0) && <div style={{color:'#555555'}}>Scanning please wait...</div>}
     </div>
   );
 };

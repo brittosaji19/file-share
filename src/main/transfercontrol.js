@@ -22,7 +22,7 @@ class TransferControl {
   removeFileFromContext(id) {
     //// TODO: Remove file from memory
   }
-  sendFileSlice(connection, id, slice = 0, size = 100000) {
+  sendFileSlice(connection, id, slice = 0, size = 10000) {
     let file = this.getFile(id);
     if (!file) return false;
     if (slice * size >= file.data.length) {
@@ -69,16 +69,14 @@ class TransferControl {
     }
     if (!file) return false;
     let current_slice = 0;
-    this.server.ipcMain().handle("download_progress", () => {
-      return {
-        peer: peer,
-        current: Math.min(current_slice * 100000, file.size),
-        max: file.size
-      };
-    });
-    // this.server
-    //   .getWindow()
-    //   .webContents.send("download_progress", peer, file.data.length, file.size);
+    // this.server.ipcMain().handle("download_progress", () => {
+    //   return {
+    //     peer: peer,
+    //     current: Math.min(current_slice * 100000, file.size),
+    //     max: file.size
+    //   };
+    // });
+
     file.connection.emit("send_slice");
     file.connection.on("slice_upload", slice => {
       console.log("slice received ", slice, current_slice, file.data.length);
@@ -87,6 +85,15 @@ class TransferControl {
         current_slice += 1;
         file.connection.emit("send_slice", file.id, current_slice);
       }
+      //Send progress update to UI
+      this.server
+        .getWindow()
+        .webContents.send(
+          "download_progress",
+          peer,
+          Math.min(file.data.length * 10000, file.size),
+          file.size
+        );
     });
 
     file.connection.on("end_upload", id => {
