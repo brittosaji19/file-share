@@ -88,7 +88,9 @@ const Main = props => {
     console.log(peer, files);
     let fileStorage = [];
     for (let file of files) {
-      let newFile = { name: file.name, path: file.path };
+      let pathSplit = file.split("/");
+      let name = pathSplit[pathSplit.length - 1];
+      let newFile = { name: name, path: file };
       ipcRenderer.invoke("sendFile", peer, newFile);
     }
   };
@@ -131,7 +133,9 @@ const Main = props => {
           />
         );
       })}
-      {(!peers || peers.length === 0) && <div style={{color:'#555555'}}>Scanning please wait...</div>}
+      {(!peers || peers.length === 0) && (
+        <div style={{ color: "#555555" }}>Scanning please wait...</div>
+      )}
     </div>
   );
 };

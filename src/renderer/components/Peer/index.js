@@ -1,9 +1,10 @@
 import React from "react";
 import ProgressBar from "../ProgressBar";
 import PersonIcon from "../../../assets/icons/person.png";
+import { ipcRenderer } from "electron";
 import "./style.css";
 const Peer = props => {
-  let fileInputRef = React.createRef();
+  // let fileInputRef = React.createRef();
   // let [showOptionsPopup, setShowOptionsPopup] = React.useState(false);
   return (
     <div
@@ -20,8 +21,14 @@ const Peer = props => {
         //   setShowOptionsPopup(true);
         // }}
         onClick={() => {
-          console.log(fileInputRef);
-          if (fileInputRef.current) fileInputRef.current.click();
+          // console.log(fileInputRef);
+          // if (fileInputRef.current) fileInputRef.current.click();
+          ipcRenderer
+            .invoke("peer-icon-click", { peer: props.peer })
+            .then(files => {
+              console.log(files);
+              props.handleFileChange(props.peer, files);
+            });
         }}
       >
         <img src={PersonIcon} alt="person" />
@@ -44,7 +51,6 @@ const Peer = props => {
           props.handleFileChange(props.peer, e.target.files);
         }}
         style={{ display: "none" }}
-        ref={fileInputRef}
       />
       {props.incomingFile && (
         <div className={"PeerActionPopupContainer"}>

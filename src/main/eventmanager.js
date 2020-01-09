@@ -1,3 +1,4 @@
+import {dialog} from "electron";
 class EventManager {
   constructor(server) {
     this.server = server;
@@ -31,6 +32,11 @@ class EventManager {
       return peerManager.getKnownPeers();
     });
   }
+  listenForPeerIconClick(){
+    this.server.ipcMain().handle("peer-icon-click", (event, args) => {
+      return dialog.showOpenDialogSync({ properties: ['openFile', 'multiSelections'] })
+    });
+  }
   listenForFileTransferRequest() {
     this.server.ipcMain().handle("sendFile", (event, peer, file) => {
       let peerManager = this.server.getPeerManager();
@@ -40,6 +46,7 @@ class EventManager {
   listenForIncomingFileRequest(socket) {
     socket.on("incoming_file_request", data => {
       let peerManager = this.server.getPeerManager();
+      console.log("Remote Address", socket.handshake.address);
       peerManager.handleIncomingFileRequest(socket, data.peer, data.filename);
     });
   }
@@ -53,6 +60,7 @@ class EventManager {
     });
     this.listenForPeerListRequest();
     this.listenForFileTransferRequest();
+    this.listenForPeerIconClick();
   }
 }
 export default EventManager;

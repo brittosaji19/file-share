@@ -22,7 +22,7 @@ class TransferControl {
   removeFileFromContext(id) {
     //// TODO: Remove file from memory
   }
-  sendFileSlice(connection, id, slice = 0, size = 10000) {
+  sendFileSlice(connection, id, slice = 0, size = 500000) {
     let file = this.getFile(id);
     if (!file) return false;
     if (slice * size >= file.data.length) {
@@ -91,7 +91,7 @@ class TransferControl {
         .webContents.send(
           "download_progress",
           peer,
-          Math.min(file.data.length * 10000, file.size),
+          Math.min(file.data.length * 500000, file.size),
           file.size
         );
     });
