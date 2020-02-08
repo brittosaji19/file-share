@@ -75,7 +75,7 @@ class TransferControl {
     }
     return false;
   }
-  registerIncomingFile(id, connection, name, size) {
+  registerIncomingFile(id, connection, name, size, sender_ip) {
     let writestream = fs.createWriteStream(
       os.homedir() + "/Downloads/" + name,
       { flags: "w" }
@@ -86,7 +86,8 @@ class TransferControl {
       name: name,
       size: size,
       data: [],
-      writestream: writestream
+      writestream: writestream,
+      sender_ip: sender_ip
     });
     console.log("registered " + name + id, writestream);
   }
@@ -126,7 +127,8 @@ class TransferControl {
           "download_progress",
           peer,
           Math.min(current_data_size, file.size),
-          file.size
+          file.size,
+          file.sender_ip
         );
     });
 
@@ -135,10 +137,7 @@ class TransferControl {
       file.connection.emit("upload_success");
       this.server
         .getWindow()
-        .webContents.send(
-          "download_complete",
-          peer
-        );
+        .webContents.send("download_complete", peer, file.sender_ip);
       // let filebuffer = new Buffer.concat(file.data);
       // console.log(filebuffer);
       // fs.open(os.homedir() + "/Downloads/" + file.name, "w", (err, fd) => {

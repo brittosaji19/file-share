@@ -19,13 +19,16 @@ const SetIncomingFileListener = callback => {
 const SetDownloadProgressListener = (callback, completion_callback) => {
   // ipcRenderer.removeAllListeners("download_progress");
   // console.log("getting progress");
-  ipcRenderer.on("download_progress", (event, peer, current, max) => {
-    console.log("got progress", peer, current, max);
-    callback(peer, current, max);
-  });
-  ipcRenderer.on("download_complete", (event, peer) => {
+  ipcRenderer.on(
+    "download_progress",
+    (event, peer, current, max, sender_ip) => {
+      console.log("got progress", peer, current, max);
+      callback(peer, current, max, sender_ip);
+    }
+  );
+  ipcRenderer.on("download_complete", (event, peer, sender_ip) => {
     console.log("got progress", peer);
-    callback(peer);
+    callback(peer, sender_ip);
   });
 };
 // const title = "File Share";
@@ -65,7 +68,7 @@ const Main = props => {
 
   if (!isLocalListenerListening) {
     getLocalPeers();
-    setInterval(getLocalPeers, 10000);
+    setInterval(getLocalPeers, 3000);
   }
   SetIncomingFileListener((peer, filename, sender_ip) => {
     let current = { ...activeAlerts };
@@ -78,17 +81,17 @@ const Main = props => {
   });
   if (!isDownloadProgressListening) {
     SetDownloadProgressListener(
-      (peer, value, max) => {
+      (peer, value, max, sender_ip) => {
         console.log("setter params value", value);
         let current = {};
-        current[peer.ip] = {};
-        current[peer.ip]["current"] = value;
-        current[peer.ip]["max"] = max;
+        current[sender_ip] = {};
+        current[sender_ip]["current"] = value;
+        current[sender_ip]["max"] = max;
         setActiveTransfers({ ...activeTransfers, ...current });
       },
-      peer => {
+      (peer, sender_ip) => {
         let current = {};
-        current[peer.ip] = null;
+        current[sender_ip] = null;
         setActiveTransfers({ ...activeTransfers, ...current });
       }
     );

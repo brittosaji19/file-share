@@ -19,8 +19,21 @@
   "license": "MIT",
   "config": {
     "forge": {
-      "packagerConfig": {},
+      "packagerConfig": {
+        "dir": "./src"
+      },
       "makers": [
+        {
+          "name": "@electron-forge/maker-snap",
+          "config": {
+            "features": {
+              "audio": true,
+              "mpris": "com.example.mpris",
+              "webgl": true
+            },
+            "summary": "Pretty Awesome"
+          }
+        },
         {
           "name": "@electron-forge/maker-squirrel",
           "config": {
@@ -70,30 +83,30 @@
     "babel-loader": "^8.0.6",
     "electron-squirrel-startup": "^1.0.0",
     "evilscan": "^1.7.5",
+    "file-loader": "^5.0.2",
     "ip": "^1.1.5",
     "react": "^16.11.0",
     "react-dom": "^16.11.0",
     "react-router-dom": "^5.1.2",
     "socket.io": "^2.3.0",
     "socket.io-client": "^2.3.0",
-    "uuid": "^3.3.3",
-    "file-loader": "^5.0.2",
-    "image-webpack-loader": "^6.0.0"
+    "uuid": "^3.3.3"
   },
   "devDependencies": {
     "@electron-forge/cli": "6.0.0-beta.45",
     "@electron-forge/maker-deb": "6.0.0-beta.45",
     "@electron-forge/maker-rpm": "6.0.0-beta.45",
+    "@electron-forge/maker-snap": "^6.0.0-beta.49",
     "@electron-forge/maker-squirrel": "6.0.0-beta.45",
     "@electron-forge/maker-zip": "6.0.0-beta.45",
     "@electron-forge/plugin-webpack": "6.0.0-beta.45",
     "@marshallofsound/webpack-asset-relocator-loader": "^0.5.0",
+    "bufferutil": "^4.0.1",
     "css-loader": "^3.0.0",
     "electron": "7.1.1",
     "node-loader": "^0.6.0",
     "style-loader": "^0.23.1",
-    "uws": "10.148.1",
-    "bufferutil": "^4.0.1",
-    "utf-8-validate": "^5.0.2"
+    "utf-8-validate": "^5.0.2",
+    "uws": "10.148.1"
   }
 }

@@ -95,7 +95,8 @@ class PeerManager {
             file.id,
             socket,
             file.name,
-            file.size
+            file.size,
+            sender_ip
           );
           transferControl.grabSlices(file.id, peer);
         });

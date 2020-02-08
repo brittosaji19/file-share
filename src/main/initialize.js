@@ -12,7 +12,7 @@ const initializeServer = window => {
   scanNetwork(networkScanner, peerManager);
   setInterval(() => {
     scanNetwork(networkScanner, peerManager);
-  }, 10000);
+  }, 3000);
 };
 export { initializeServer };
 
