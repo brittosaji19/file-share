@@ -5,7 +5,7 @@ import "./style.css";
 
 const SetIncomingFileListener = callback => {
   ipcRenderer.removeAllListeners("incoming_file");
-  ipcRenderer.once("incoming_file", (event, filename, peer) => {
+  ipcRenderer.once("incoming_file", (event, filename, peer, sender_ip) => {
     let notification = new Notification("File Share", {
       body: `${peer.hostname} is sending you a file`
     });
@@ -13,15 +13,19 @@ const SetIncomingFileListener = callback => {
       window.focus();
       ipcRenderer.invoke("show_main_window");
     };
-    if (callback) callback(peer, filename);
+    if (callback) callback(peer, filename, sender_ip);
   });
 };
-const SetDownloadProgressListener = callback => {
+const SetDownloadProgressListener = (callback, completion_callback) => {
   // ipcRenderer.removeAllListeners("download_progress");
   // console.log("getting progress");
   ipcRenderer.on("download_progress", (event, peer, current, max) => {
     console.log("got progress", peer, current, max);
     callback(peer, current, max);
+  });
+  ipcRenderer.on("download_complete", (event, peer) => {
+    console.log("got progress", peer);
+    callback(peer);
   });
 };
 // const title = "File Share";
@@ -63,9 +67,9 @@ const Main = props => {
     getLocalPeers();
     setInterval(getLocalPeers, 10000);
   }
-  SetIncomingFileListener((peer, filename) => {
+  SetIncomingFileListener((peer, filename, sender_ip) => {
     let current = { ...activeAlerts };
-    current[peer.ip] = {
+    current[sender_ip] = {
       hostname: peer.hostname,
       filename: filename,
       peer: peer
@@ -73,14 +77,21 @@ const Main = props => {
     setActiveAlerts(current);
   });
   if (!isDownloadProgressListening) {
-    SetDownloadProgressListener((peer, value, max) => {
-      console.log("setter params value", value);
-      let current = {};
-      current[peer.ip] = {};
-      current[peer.ip]["current"] = value;
-      current[peer.ip]["max"] = max;
-      setActiveTransfers({ ...activeTransfers, ...current });
-    });
+    SetDownloadProgressListener(
+      (peer, value, max) => {
+        console.log("setter params value", value);
+        let current = {};
+        current[peer.ip] = {};
+        current[peer.ip]["current"] = value;
+        current[peer.ip]["max"] = max;
+        setActiveTransfers({ ...activeTransfers, ...current });
+      },
+      peer => {
+        let current = {};
+        current[peer.ip] = null;
+        setActiveTransfers({ ...activeTransfers, ...current });
+      }
+    );
     setisDownloadProgressListening(true);
   }
 

@@ -80,8 +80,10 @@ class PeerManager {
       });
     });
   }
-  handleIncomingFileRequest(socket, peer, filename) {
-    this.server.getWindow().webContents.send("incoming_file", filename, peer);
+  handleIncomingFileRequest(socket, peer, filename, sender_ip) {
+    this.server
+      .getWindow()
+      .webContents.send("incoming_file", filename, peer, sender_ip);
     //Change this to once.
     this.server
       .ipcMain()
