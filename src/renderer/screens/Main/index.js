@@ -102,7 +102,13 @@ const Main = props => {
     console.log(peer, files);
     let fileStorage = [];
     for (let file of files) {
-      let pathSplit = file.split("/");
+      let pathSplit = null;
+      // Handling file name error for windows.
+      if (os.platform() == "win32") {
+        pathSplit = file.split("\\");
+      } else {
+        pathSplit = file.split("/");
+      }
       let name = pathSplit[pathSplit.length - 1];
       let newFile = { name: name, path: file };
       ipcRenderer.invoke("sendFile", peer, newFile);
