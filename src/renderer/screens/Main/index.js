@@ -2,6 +2,7 @@ import React, { useEffect } from "react";
 import { ipcRenderer } from "electron";
 import Peer from "../../Components/Peer";
 import "./style.css";
+import os from "os";
 
 const SetIncomingFileListener = callback => {
   ipcRenderer.removeAllListeners("incoming_file");
